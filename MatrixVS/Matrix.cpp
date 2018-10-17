@@ -199,6 +199,22 @@ bool Matrix::isEqualSizes(const Matrix& obj) const
 	return obj.rowsCount() == rowsCount() && obj.columnsCount() == columnsCount();
 }
 
+Matrix Matrix::pow(unsigned degree) const
+{
+	if(!isRectangle())
+		throw std::exception("matrix is not rectangle");
+	if(degree == 0)
+		throw std::exception("zero degree");
+
+	Matrix copy(*this);
+	for (auto i = 0; i < degree; i++)
+	{
+		copy *= copy;
+	}
+	
+	return copy;
+}
+
 /////////////////////////////////////////////-----------------operatoers 
 Matrix Matrix::operator+=(const Matrix& obj)
 {

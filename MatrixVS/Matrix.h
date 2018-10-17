@@ -15,7 +15,6 @@ public:
 	Matrix(size_t rowsCount, size_t columnsCount,const std::vector<std::complex<double>> &arr);
 
 	~Matrix();
-	//friend std::ostream& operator <<(std::ostream &os, const Matrix &obj);
 
 	unsigned int columnsCount() const;
 	unsigned int rowsCount() const;
@@ -36,6 +35,7 @@ public:
 	bool isRectangle() const;
 	bool isEqualSizes(const Matrix &obj) const;
 
+	Matrix pow(unsigned int degree) const;
 
 	Matrix operator += (const Matrix &obj);
 	Matrix operator -= (const Matrix &obj);
