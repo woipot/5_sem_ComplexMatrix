@@ -199,7 +199,7 @@ bool Matrix::isEqualSizes(const Matrix& obj) const
 	return obj.rowsCount() == rowsCount() && obj.columnsCount() == columnsCount();
 }
 
-Matrix Matrix::pow(unsigned degree) const
+Matrix Matrix::matrixPow(unsigned degree) const
 {
 	if(!isRectangle())
 		throw std::exception("matrix is not rectangle");

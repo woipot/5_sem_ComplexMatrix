@@ -35,7 +35,7 @@ public:
 	bool isRectangle() const;
 	bool isEqualSizes(const Matrix &obj) const;
 
-	Matrix pow(unsigned int degree) const;
+	Matrix matrixPow(unsigned int degree) const;
 
 	Matrix operator += (const Matrix &obj);
 	Matrix operator -= (const Matrix &obj);
