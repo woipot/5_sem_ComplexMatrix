@@ -21,21 +21,6 @@ Matrix::Matrix(size_t rowsCount, size_t columnsCount)
 	_matrix = createArr(rowsCount, columnsCount);
 }
 
-std::complex<double> Matrix::getTrack() const
-{
-	auto result = std::complex<double>(0, 0);
-
-	auto i = 0;
-	while( i < rowsCount() && i < columnsCount())
-	{
-		result += _matrix[i][i];
-		i++;
-	}
-	return result;
-
-}
-
-
 Matrix::Matrix(size_t rowsCount, size_t columnsCount,const std::vector<std::complex<double>> &arr)
 {
 	_columnsCount = columnsCount;
@@ -69,6 +54,8 @@ Matrix::~Matrix()
 	delete _matrix;
 }
 
+
+
 unsigned int Matrix::columnsCount() const
 {
 	return _columnsCount;
@@ -91,6 +78,8 @@ void Matrix::setCase(std::complex<double> num, unsigned i, unsigned j)
 {
 	this->_matrix[i][j] = num;
 }
+
+
 
 std::complex<double> Matrix::getDeterminant() const
 {
@@ -164,6 +153,41 @@ void Matrix::transpose()
 		for (unsigned int j = 0; j < a.columnsCount(); j++)
 			this->_matrix[j][i] = a._matrix[i][j];
 }
+
+std::complex<double> Matrix::getTrack() const
+{
+	auto result = std::complex<double>(0, 0);
+
+	auto i = 0;
+	while (i < rowsCount() && i < columnsCount())
+	{
+		result += _matrix[i][i];
+		i++;
+	}
+	return result;
+
+}
+
+
+Matrix Matrix::getComplexConjugate() const
+{
+	Matrix copy(*this);
+	auto additional = std::complex<double>(0, -1);
+
+	for (unsigned int i = 0; i < rowsCount(); i++)
+		for (unsigned int j = 0; j < columnsCount(); j++)
+			copy._matrix[i][j] = copy._matrix[i][j] * additional;
+
+	return copy;
+}
+
+Matrix Matrix::getErmiteConjugate() const
+{
+	auto resultMatrix = getComplexConjugate();
+	resultMatrix.transpose();
+	return resultMatrix;
+}
+
 
 bool Matrix::isRectangle() const
 {

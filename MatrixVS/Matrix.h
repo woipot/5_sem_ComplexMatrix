@@ -29,7 +29,9 @@ public:
 	Matrix inverseMatrix() const;
 	void transpose();
 	std::complex<double> getTrack() const;
-
+	
+	Matrix getComplexConjugate() const;
+	Matrix getErmiteConjugate() const;
 
 	bool isRectangle() const;
 	bool isEqualSizes(const Matrix &obj) const;
