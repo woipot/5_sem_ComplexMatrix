@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "matrix.h"
 #include <cstdarg>
+#include <ctime>
 
 Matrix::Matrix(const Matrix& obj)
 {
@@ -13,8 +14,29 @@ Matrix::Matrix(const Matrix& obj)
 			_matrix[i][j] = obj._matrix[i][j];
 }
 
+Matrix::Matrix(size_t rowsCount, size_t columnsCount)
+{
+	_columnsCount = columnsCount;
+	_rowsCount = rowsCount;
+	_matrix = createArr(rowsCount, columnsCount);
+}
 
-Matrix::Matrix(size_t rowsCount, size_t columnsCount, ...)
+std::complex<double> Matrix::getTrack() const
+{
+	auto result = std::complex<double>(0, 0);
+
+	auto i = 0;
+	while( i < rowsCount() && i < columnsCount())
+	{
+		result += _matrix[i][i];
+		i++;
+	}
+	return result;
+
+}
+
+
+Matrix::Matrix(size_t rowsCount, size_t columnsCount,const std::vector<std::complex<double>> &arr)
 {
 	_columnsCount = columnsCount;
 	_rowsCount = rowsCount;
@@ -23,13 +45,9 @@ Matrix::Matrix(size_t rowsCount, size_t columnsCount, ...)
 
 	const int paramsCount = columnsCount * rowsCount;
 
-	va_list uk_arg;
-	va_start(uk_arg, columnsCount);  /*  установка указателя uk_arg на  */
-
-
 	int currentRow = 0;
 	int currentColumn = 0;
-	for (int counter = 0; counter < paramsCount; counter++)
+	for (int counter = 0; counter < arr.size(); counter++)
 	{
 		if (currentColumn == columnsCount)
 			currentColumn = 0;
@@ -37,18 +55,18 @@ Matrix::Matrix(size_t rowsCount, size_t columnsCount, ...)
 			currentRow++;
 
 
-		auto param = va_arg(uk_arg, double);
-		if(param == -1)
-			return;
-			
+		auto param = arr.at(counter);
 
-		_matrix[currentRow][currentColumn] = std::complex<double>(param);
+		_matrix[currentRow][currentColumn] = param;
 
 		currentColumn++;
 	}
 
-	va_end(uk_arg);       
+}
 
+Matrix::~Matrix()
+{
+	delete _matrix;
 }
 
 unsigned int Matrix::columnsCount() const
@@ -74,7 +92,7 @@ void Matrix::setCase(std::complex<double> num, unsigned i, unsigned j)
 	this->_matrix[i][j] = num;
 }
 
-std::complex<double> Matrix::determinant() const
+std::complex<double> Matrix::getDeterminant() const
 {
 	auto d = std::complex<double>(0, 0);
 	auto k = std::complex<double>(1, 0);
@@ -98,7 +116,7 @@ std::complex<double> Matrix::determinant() const
 	if (rowsCount() > 2) {
 		for (unsigned int i = 0; i < rowsCount(); i++) {
 			Matrix p = extractMatrix(i, 0);
-			d = d + k * _matrix[i][0] * p.determinant();
+			d = d + k * _matrix[i][0] * p.getDeterminant();
 			k = -k;
 		}
 	}
@@ -122,23 +140,23 @@ Matrix Matrix::extractMatrix(unsigned i, unsigned j) const
 
 Matrix Matrix::inverseMatrix() const
 {
-	auto num = this->determinant();
+	auto num = this->getDeterminant();
 	if (num.real() != 0) {
 		Matrix mainMat(rowsCount(), columnsCount());
 		for (unsigned int i = 0; i < rowsCount(); i++)
 			for (unsigned int j = 0; j < columnsCount(); j++) {
 				Matrix minor = extractMatrix(i, j);
-				const auto setter = pow(-1.0, i + j) * minor.determinant() / num;
+				const auto setter = pow(-1.0, i + j) * minor.getDeterminant() / num;
 				
 				mainMat.setCase(setter, i, j);
 			}
-		mainMat.transponire();
+		mainMat.transpose();
 		return mainMat;
 	}
 	else throw std::exception("determianant = 0");
 }
 
-void Matrix::transponire()
+void Matrix::transpose()
 {
 	const Matrix a(*this);
 	resize(columnsCount(), rowsCount());
@@ -269,6 +287,7 @@ Matrix Matrix::operator=(const std::complex<double>& num)
 }
 
 
+
 /////------ simple operations
 Matrix operator+(const Matrix& obj1, const Matrix& obj2)
 {
@@ -355,6 +374,27 @@ Matrix operator/(const Matrix& obj, const std::complex<double>& num)
 }
 
 ///////////////////////////////////////// ----------------------------------
+Matrix Matrix::createRandom()
+{
+	srand(time(nullptr));
+	auto rowsCount = rand() % 50 + 1;
+	auto columsCount = rand() % 50 + 1;
+
+	auto paramsCount = rowsCount * columsCount;
+	auto randParams = std::vector<std::complex<double>>();
+
+	for (auto i = 0; i < paramsCount; i++ )
+	{
+		auto randomComplex = (rand(), rand());
+		randParams.push_back(randomComplex);
+	}
+
+
+	return Matrix(rowsCount, columsCount, randParams);
+
+}
+
+
 void Matrix::resize(size_t newRowsCount, size_t newColumsCount)
 {
 	delete _matrix;

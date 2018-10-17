@@ -11,8 +11,10 @@ class Matrix
 
 public:
 	Matrix(const Matrix &obj);
-	Matrix(size_t rowsCount, size_t columnsCount, ...);
+	Matrix(size_t rowsCount, size_t columnsCount);
+	Matrix(size_t rowsCount, size_t columnsCount,const std::vector<std::complex<double>> &arr);
 
+	~Matrix();
 	//friend std::ostream& operator <<(std::ostream &os, const Matrix &obj);
 
 	unsigned int columnsCount() const;
@@ -21,11 +23,13 @@ public:
 	std::complex<double> getCase(const unsigned int &i, const unsigned int &j) const;
 	void setCase(std::complex<double> num, unsigned int i, unsigned int j);
 
-	std::complex<double> determinant() const;
+	std::complex<double> getDeterminant() const;
 
 	Matrix extractMatrix(unsigned int i, unsigned int j) const;
 	Matrix inverseMatrix() const;
-	void transponire();
+	void transpose();
+	std::complex<double> getTrack() const;
+
 
 	bool isRectangle() const;
 	bool isEqualSizes(const Matrix &obj) const;
@@ -42,6 +46,8 @@ public:
 	Matrix operator *= (const std::complex<double> &num);
 	Matrix operator /= (const std::complex<double> &num);
 	Matrix operator =  (const std::complex<double> &num);
+
+	static Matrix createRandom();
 
 	friend std::ostream& operator<<(std::ostream& os, const Matrix& obj);
 
