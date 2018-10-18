@@ -2,12 +2,13 @@
 #include "matrix.h"
 #include <cstdarg>
 #include <ctime>
+#include <algorithm>
 
 Matrix::Matrix(const Matrix& obj)
 {
 	_columnsCount = obj._columnsCount;
 	_rowsCount = obj._rowsCount;
-	_matrix = createArr(_rowsCount, _columnsCount);
+	_matrix = createArr(_rowsCount, _columnsCount, std::complex<double>(0));
 
 	for (unsigned int i = 0; i < _rowsCount; i++)
 		for (unsigned int j = 0; j < _columnsCount; j++)
@@ -18,14 +19,14 @@ Matrix::Matrix(size_t rowsCount, size_t columnsCount)
 {
 	_columnsCount = columnsCount;
 	_rowsCount = rowsCount;
-	_matrix = createArr(rowsCount, columnsCount);
+	_matrix = createArr(rowsCount, columnsCount, std::complex<double>(0));
 }
 
 Matrix::Matrix(size_t rowsCount, size_t columnsCount,const std::vector<std::complex<double>> &arr)
 {
 	_columnsCount = columnsCount;
 	_rowsCount = rowsCount;
-	_matrix = createArr(rowsCount, columnsCount);
+	_matrix = createArr(rowsCount, columnsCount, std::complex<double>(0));
 
 
 	const int paramsCount = columnsCount * rowsCount;
@@ -197,6 +198,72 @@ bool Matrix::isRectangle() const
 bool Matrix::isEqualSizes(const Matrix& obj) const
 {
 	return obj.rowsCount() == rowsCount() && obj.columnsCount() == columnsCount();
+}
+
+void Matrix::test() const
+{
+	if (!isRectangle())
+		throw std::exception("Is'nt rectangle matrix");
+
+	auto size = rowsCount();
+	auto d = getDiagonale();
+	auto z = createArr(size, size, std::complex<double>(1));
+
+
+	auto underDCount = (size * size - size) / 2;
+	auto e = new std::complex<double>[underDCount + 2];
+	
+	auto counter = 0;
+	for(auto i = 0; i < size; i++)
+	{
+		for (auto j = 0; j < counter; j++)
+		{
+			e[i + 2] =_matrix[i][j];
+		}
+		counter++;
+	}
+	
+
+	int m, l, iter, i, k;
+	std::complex<double> s, r, p, g, f, dd, c, b;
+	for (i = 2; i <= size; i++) e[i - 1] = e[i];
+	e[size] = 0.;
+	for (l = 1; l <= size; l++) {
+		iter = 0;
+		do {
+			for (m = l; m <= size - 1; m++) {
+				dd = abs(d[m]) + abs(d[m + 1]);
+				if ((abs(e[m]) + dd) == dd)
+				{
+					break;
+				}
+			}
+			if (m != l) {
+				if (++iter >= MAXITER) throw std::exception("Too many iterations in tqli");
+				g = (d[l + 1] - d[l]) / (2.*e[l]); 
+				
+				
+				r = sqrt(std::complex<double>(1) + g * g);
+				if (g.real() >= 0.) g += abs(r);
+				else g -= abs(r);
+				g = d[m] - d[l] + e[l] / g;
+				s = c = 1.; p = 0.;
+				for (i = m - 1; i >= l; i--) {
+					f = s * e[i]; b = c * e[i];
+					e[i + 1] = r = sqrt(f*f +  g*g);
+					if (r == 0.) { d[i + 1] -= p; e[m] = 0.; break; }
+					s = f / r; c = g / r; g = d[i + 1] - p; r = (d[i] - g)*s + 2.*c*b; d[i + 1] = g + (p = s * r); g = c * r - b;
+					for (k = 1; k <= size; k++) {
+						f = z[k][i + 1]; z[k][i + 1] = s * z[k][i] + c * f; z[k][i] = c * z[k][i] - s * f;
+					}
+				}
+				if (r == 0. && i >= l) continue;
+				d[l] -= p; e[l] = g; e[m] = 0.;
+			}
+		} while (m != l);
+	}
+
+
 }
 
 Matrix Matrix::matrixPow(unsigned degree) const
@@ -442,11 +509,11 @@ void Matrix::resize(size_t newRowsCount, size_t newColumsCount)
 	_columnsCount = newColumsCount;
 	_rowsCount = newRowsCount;
 
-	_matrix = createArr(newRowsCount, newColumsCount);
+	_matrix = createArr(newRowsCount, newColumsCount, std::complex<double>(0));
 
 }
 
-std::complex<double> ** Matrix::createArr(size_t rowsCount, size_t columsCount)
+std::complex<double> ** Matrix::createArr(size_t rowsCount, size_t columsCount, std::complex<double> defaultParam)
 {
 	std::complex<double> **resultArr = new std::complex<double> *[rowsCount];
 	for (int i = 0; i < rowsCount; i++)
@@ -454,20 +521,33 @@ std::complex<double> ** Matrix::createArr(size_t rowsCount, size_t columsCount)
 		resultArr[i] = new std::complex<double>[columsCount];
 	}
 
-	setDefaultParams(rowsCount, columsCount, 0, resultArr);
+	setDefaultParams(rowsCount, columsCount, defaultParam, resultArr);
 	return resultArr;
 }
 
-void Matrix::setDefaultParams(size_t rowsCount, size_t columsCount, double defaultParam, std::complex<double> **obj)
+void Matrix::setDefaultParams(size_t rowsCount, size_t columsCount, std::complex<double> defaultParam, std::complex<double> **obj)
 {
 	for (int i = 0; i < rowsCount; i++)
 	{
 		for (int j = 0; j < columsCount; j++)
 		{
-			obj[i][j] = std::complex<double>(defaultParam, 0);
+			obj[i][j] = defaultParam;
 		}
 	}
 }
+
+std::complex<double>* Matrix::getDiagonale() const
+{
+	auto size = std::min(rowsCount(), columnsCount());
+	auto result = new std::complex<double>[size];
+
+	for(auto i = 0; i < size; i++)
+	{
+		result[i] = _matrix[i][i];
+	}
+	return result;
+}
+
 
 
 std::ostream& operator<<(std::ostream& os, const Matrix& obj)
