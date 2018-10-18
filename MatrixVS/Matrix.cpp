@@ -201,7 +201,7 @@ bool Matrix::isEqualSizes(const Matrix& obj) const
 }
 
 void Matrix::test() const
-{/*
+{
 	if (!isRectangle())
 		throw std::exception("Is'nt rectangle matrix");
 
@@ -222,13 +222,13 @@ void Matrix::test() const
 		}
 		counter++;
 	}
-	*/
+	
 
-	//int m, l, iter, i, k;
-	//std::complex<double> s, r, p, g, f, dd, c, b;
-	//for (i = 2; i <= size; i++) e[i - 1] = e[i];
-	//e[size] = 0.;
-	/*for (l = 1; l <= size; l++) {
+	int m, l, iter, i, k;
+	std::complex<double> s, r, p, g, f, dd, c, b;
+	for (i = 2; i <= size; i++) e[i - 1] = e[i];
+	e[size] = 0.;
+	for (l = 1; l <= size; l++) {
 		iter = 0;
 		do {
 			for (m = l; m <= size - 1; m++) {
@@ -262,7 +262,7 @@ void Matrix::test() const
 			}
 		} while (m != l);
 	}
-*/
+
 
 }
 
@@ -538,7 +538,7 @@ void Matrix::setDefaultParams(size_t rowsCount, size_t columsCount, std::complex
 
 std::complex<double>* Matrix::getDiagonale() const
 {
-	auto size = std::min_element(rowsCount(), columnsCount());
+	auto size = std::min(rowsCount(), columnsCount());
 	auto result = new std::complex<double>[size];
 
 	for(auto i = 0; i < size; i++)
