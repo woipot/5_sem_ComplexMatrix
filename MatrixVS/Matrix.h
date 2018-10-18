@@ -35,10 +35,12 @@ public:
 	Matrix getComplexConjugate() const;
 	Matrix getErmiteConjugate() const;
 
+	std::complex<double> *getOwnNumbers() const;
+	std::complex<double> **getOwnVectors() const;
+
 	bool isRectangle() const;
 	bool isEqualSizes(const Matrix &obj) const;
 
-	void test() const;
 
 	Matrix matrixPow(unsigned int degree) const;
 
@@ -63,6 +65,7 @@ private:
 	static void setDefaultParams(size_t rowsCount, size_t columsCount, std::complex<double> defaultParam, std::complex<double> **obj);
 	void resize(size_t newRowsCount, size_t newColumsCount);
 	std::complex<double>* getDiagonale() const;
+	void getNumbersAndVectors(std::complex<double> ***vectors, std::complex<double> **numbers) const;
 
 private:
 	size_t _columnsCount;

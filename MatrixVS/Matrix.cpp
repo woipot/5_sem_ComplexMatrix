@@ -22,6 +22,22 @@ Matrix::Matrix(size_t rowsCount, size_t columnsCount)
 	_matrix = createArr(rowsCount, columnsCount, std::complex<double>(0));
 }
 
+std::complex<double>* Matrix::getOwnNumbers() const
+{
+	std::complex<double> **vectors, *numbers;
+	getNumbersAndVectors(&vectors, &numbers);
+
+	return numbers;
+}
+
+std::complex<double>** Matrix::getOwnVectors() const
+{
+	std::complex<double> **vectors, *numbers;
+	getNumbersAndVectors(&vectors, &numbers);
+
+	return vectors;
+}
+
 Matrix::Matrix(size_t rowsCount, size_t columnsCount,const std::vector<std::complex<double>> &arr)
 {
 	_columnsCount = columnsCount;
@@ -200,71 +216,6 @@ bool Matrix::isEqualSizes(const Matrix& obj) const
 	return obj.rowsCount() == rowsCount() && obj.columnsCount() == columnsCount();
 }
 
-void Matrix::test() const
-{
-	if (!isRectangle())
-		throw std::exception("Is'nt rectangle matrix");
-
-	auto size = rowsCount();
-	auto d = getDiagonale();
-	auto z = createArr(size, size, std::complex<double>(1));
-
-
-	auto underDCount = (size * size - size) / 2;
-	auto e = new std::complex<double>[underDCount + 2];
-	
-	auto counter = 0;
-	for(auto i = 0; i < size; i++)
-	{
-		for (auto j = 0; j < counter; j++)
-		{
-			e[i + 2] =_matrix[i][j];
-		}
-		counter++;
-	}
-	
-
-	int m, l, iter, i, k;
-	std::complex<double> s, r, p, g, f, dd, c, b;
-	for (i = 2; i <= size; i++) e[i - 1] = e[i];
-	e[size] = 0.;
-	for (l = 1; l <= size; l++) {
-		iter = 0;
-		do {
-			for (m = l; m <= size - 1; m++) {
-				dd = abs(d[m]) + abs(d[m + 1]);
-				if ((abs(e[m]) + dd) == dd)
-				{
-					break;
-				}
-			}
-			if (m != l) {
-				if (++iter >= MAXITER) throw std::exception("Too many iterations in tqli");
-				g = (d[l + 1] - d[l]) / (2.*e[l]); 
-				
-				
-				r = sqrt(std::complex<double>(1) + g * g);
-				if (g.real() >= 0.) g += abs(r);
-				else g -= abs(r);
-				g = d[m] - d[l] + e[l] / g;
-				s = c = 1.; p = 0.;
-				for (i = m - 1; i >= l; i--) {
-					f = s * e[i]; b = c * e[i];
-					e[i + 1] = r = sqrt(f*f +  g*g);
-					if (r == 0.) { d[i + 1] -= p; e[m] = 0.; break; }
-					s = f / r; c = g / r; g = d[i + 1] - p; r = (d[i] - g)*s + 2.*c*b; d[i + 1] = g + (p = s * r); g = c * r - b;
-					for (k = 1; k <= size; k++) {
-						f = z[k][i + 1]; z[k][i + 1] = s * z[k][i] + c * f; z[k][i] = c * z[k][i] - s * f;
-					}
-				}
-				if (r == 0. && i >= l) continue;
-				d[l] -= p; e[l] = g; e[m] = 0.;
-			}
-		} while (m != l);
-	}
-
-
-}
 
 Matrix Matrix::matrixPow(unsigned degree) const
 {
@@ -546,6 +497,73 @@ std::complex<double>* Matrix::getDiagonale() const
 		result[i] = _matrix[i][i];
 	}
 	return result;
+}
+
+void Matrix::getNumbersAndVectors(std::complex<double> ***vectors, std::complex<double> **numbers) const
+{
+	if (!isRectangle())
+		throw std::exception("Is'nt rectangle matrix");
+
+	auto size = rowsCount();
+	auto d = getDiagonale();
+	auto z = createArr(size, size, std::complex<double>(1));
+
+
+	auto underDCount = (size * size - size) / 2;
+	std::complex<double> *e = new std::complex<double>[underDCount + 2];
+
+	auto counter = 0;
+	for (auto i = 0; i < size; i++)
+	{
+		for (auto j = 0; j < counter; j++)
+		{
+			e[i + 2] = _matrix[i][j];
+		}
+		counter++;
+	}
+
+
+	int m, l, iter, i, k;
+	std::complex<double> s, r, p, g, f, dd, c, b;
+	for (i = 2; i <= size; i++) e[i - 1] = e[i];
+	e[size] = 0.;
+	for (l = 1; l <= size; l++) {
+		iter = 0;
+		do {
+			for (m = l; m <= size - 1; m++) {
+				dd = abs(d[m]) + abs(d[m + 1]);
+				if ((abs(e[m]) + dd) == dd)
+				{
+					break;
+				}
+			}
+			if (m != l) {
+				if (++iter >= MAXITER) throw std::exception("Too many iterations in tqli");
+				g = (d[l + 1] - d[l]) / (2.*e[l]);
+
+
+				r = sqrt(std::complex<double>(1) + g * g);
+				if (g.real() >= 0.) g += abs(r);
+				else g -= abs(r);
+				g = d[m] - d[l] + e[l] / g;
+				s = c = 1.; p = 0.;
+				for (i = m - 1; i >= l; i--) {
+					f = s * e[i]; b = c * e[i];
+					e[i + 1] = r = sqrt(f*f + g * g);
+					if (r == 0.) { d[i + 1] -= p; e[m] = 0.; break; }
+					s = f / r; c = g / r; g = d[i + 1] - p; r = (d[i] - g)*s + 2.*c*b; d[i + 1] = g + (p = s * r); g = c * r - b;
+					for (k = 1; k <= size; k++) {
+						f = z[k][i + 1]; z[k][i + 1] = s * z[k][i] + c * f; z[k][i] = c * z[k][i] - s * f;
+					}
+				}
+				if (r == 0. && i >= l) continue;
+				d[l] -= p; e[l] = g; e[m] = 0.;
+			}
+		} while (m != l);
+	}
+
+	*numbers = d;
+	*vectors = z;
 }
 
 
