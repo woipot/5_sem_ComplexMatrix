@@ -8,7 +8,7 @@ Matrix::Matrix(const Matrix& obj)
 {
 	_columnsCount = obj._columnsCount;
 	_rowsCount = obj._rowsCount;
-	_matrix = createArr(_rowsCount, _columnsCount, std::complex<double>(0));
+	_matrix = createArr(_rowsCount, _columnsCount, Complex(0));
 
 	for (unsigned int i = 0; i < _rowsCount; i++)
 		for (unsigned int j = 0; j < _columnsCount; j++)
@@ -19,30 +19,30 @@ Matrix::Matrix(size_t rowsCount, size_t columnsCount)
 {
 	_columnsCount = columnsCount;
 	_rowsCount = rowsCount;
-	_matrix = createArr(rowsCount, columnsCount, std::complex<double>(0));
+	_matrix = createArr(rowsCount, columnsCount, Complex(0));
 }
 
-std::complex<double>* Matrix::getOwnNumbers() const
+Complex* Matrix::getOwnNumbers() const
 {
-	std::complex<double> **vectors, *numbers;
+	Complex **vectors, *numbers;
 	getNumbersAndVectors(&vectors, &numbers);
 
 	return numbers;
 }
 
-std::complex<double>** Matrix::getOwnVectors() const
+Complex** Matrix::getOwnVectors() const
 {
-	std::complex<double> **vectors, *numbers;
+	Complex **vectors, *numbers;
 	getNumbersAndVectors(&vectors, &numbers);
 
 	return vectors;
 }
 
-Matrix::Matrix(size_t rowsCount, size_t columnsCount,const std::vector<std::complex<double>> &arr)
+Matrix::Matrix(size_t rowsCount, size_t columnsCount,const std::vector<Complex> &arr)
 {
 	_columnsCount = columnsCount;
 	_rowsCount = rowsCount;
-	_matrix = createArr(rowsCount, columnsCount, std::complex<double>(0));
+	_matrix = createArr(rowsCount, columnsCount, Complex(0));
 
 
 	const int paramsCount = columnsCount * rowsCount;
@@ -83,7 +83,7 @@ unsigned int Matrix::rowsCount() const
 	return _rowsCount;
 }
 
-std::complex<double> Matrix::getCase(const unsigned& i, const unsigned& j) const
+Complex Matrix::getCase(const unsigned& i, const unsigned& j) const
 {
 	if (i > rowsCount() || j > columnsCount())
 		throw std::out_of_range("uncorrect index");
@@ -91,17 +91,17 @@ std::complex<double> Matrix::getCase(const unsigned& i, const unsigned& j) const
 	return _matrix[i][j];
 }
 
-void Matrix::setCase(std::complex<double> num, unsigned i, unsigned j)
+void Matrix::setCase(Complex num, unsigned i, unsigned j)
 {
 	this->_matrix[i][j] = num;
 }
 
 
 
-std::complex<double> Matrix::getDeterminant() const
+Complex Matrix::getDeterminant() const
 {
-	auto d = std::complex<double>(0, 0);
-	auto k = std::complex<double>(1, 0);
+	auto d = Complex(0, 0);
+	auto k = Complex(1, 0);
 
 
 	if (!isRectangle())
@@ -152,7 +152,7 @@ Matrix Matrix::inverseMatrix() const
 		for (unsigned int i = 0; i < rowsCount(); i++)
 			for (unsigned int j = 0; j < columnsCount(); j++) {
 				Matrix minor = extractMatrix(i, j);
-				const auto setter = pow(-1.0, i + j) * minor.getDeterminant() / num;
+				Complex setter = Complex(pow(-1.0, i + j)) * minor.getDeterminant() / num;
 				
 				mainMat.setCase(setter, i, j);
 			}
@@ -171,9 +171,9 @@ void Matrix::transpose()
 			this->_matrix[j][i] = a._matrix[i][j];
 }
 
-std::complex<double> Matrix::getTrack() const
+Complex Matrix::getTrack() const
 {
-	auto result = std::complex<double>(0, 0);
+	auto result = Complex(0, 0);
 
 	auto i = 0;
 	while (i < rowsCount() && i < columnsCount())
@@ -189,7 +189,7 @@ std::complex<double> Matrix::getTrack() const
 Matrix Matrix::getComplexConjugate() const
 {
 	Matrix copy(*this);
-	auto additional = std::complex<double>(0, -1);
+	auto additional = Complex(0, -1);
 
 	for (unsigned int i = 0; i < rowsCount(); i++)
 		for (unsigned int j = 0; j < columnsCount(); j++)
@@ -299,7 +299,7 @@ Matrix Matrix::operator=(const Matrix& obj)
 	return *this;
 }
 
-Matrix Matrix::operator+=(const std::complex<double>& num)
+Matrix Matrix::operator+=(const Complex& num)
 {
 	for (unsigned int i = 0; i < rowsCount(); i++)
 		for (unsigned int j = 0; j < columnsCount(); j++) {
@@ -308,7 +308,7 @@ Matrix Matrix::operator+=(const std::complex<double>& num)
 	return *this;
 }
 
-Matrix Matrix::operator-=(const std::complex<double>& num)
+Matrix Matrix::operator-=(const Complex& num)
 {
 	for (unsigned int i = 0; i < rowsCount(); i++)
 		for (unsigned int j = 0; j < columnsCount(); j++) {
@@ -317,7 +317,7 @@ Matrix Matrix::operator-=(const std::complex<double>& num)
 	return *this;
 }
 
-Matrix Matrix::operator*=(const std::complex<double>& num)
+Matrix Matrix::operator*=(const Complex& num)
 {
 	for (unsigned int i = 0; i < rowsCount(); i++)
 		for (unsigned int j = 0; j < columnsCount(); j++) {
@@ -326,7 +326,7 @@ Matrix Matrix::operator*=(const std::complex<double>& num)
 	return *this;
 }
 
-Matrix Matrix::operator/=(const std::complex<double>& num)
+Matrix Matrix::operator/=(const Complex& num)
 {
 	for (unsigned int i = 0; i < rowsCount(); i++)
 		for (unsigned int j = 0; j < columnsCount(); j++) {
@@ -335,7 +335,7 @@ Matrix Matrix::operator/=(const std::complex<double>& num)
 	return *this;
 }
 
-Matrix Matrix::operator=(const std::complex<double>& num)
+Matrix Matrix::operator=(const Complex& num)
 {
 	for (unsigned int i = 0; i < rowsCount(); i++)
 		for (unsigned int j = 0; j < columnsCount(); j++) {
@@ -403,28 +403,28 @@ Matrix operator/(const Matrix& obj1, const Matrix& obj2)
 	}
 }
 
-Matrix operator+(const Matrix& obj, const std::complex<double>& num)
+Matrix operator+(const Matrix& obj, const Complex& num)
 {
 	Matrix copy(obj);
 
 	return copy += num;
 }
 
-Matrix operator-(const Matrix& obj, const std::complex<double>& num)
+Matrix operator-(const Matrix& obj, const Complex& num)
 {
 	Matrix copy(obj);
 
 	return copy -= num;
 }
 
-Matrix operator*(const Matrix& obj, const std::complex<double>& num)
+Matrix operator*(const Matrix& obj, const Complex& num)
 {
 	Matrix copy(obj);
 
 	return copy *= num;
 }
 
-Matrix operator/(const Matrix& obj, const std::complex<double>& num)
+Matrix operator/(const Matrix& obj, const Complex& num)
 {
 	Matrix copy(obj);
 
@@ -439,7 +439,7 @@ Matrix Matrix::createRandom()
 	auto columsCount = rand() % 50 + 1;
 
 	auto paramsCount = rowsCount * columsCount;
-	auto randParams = std::vector<std::complex<double>>();
+	auto randParams = std::vector<Complex>();
 
 	for (auto i = 0; i < paramsCount; i++ )
 	{
@@ -460,23 +460,23 @@ void Matrix::resize(size_t newRowsCount, size_t newColumsCount)
 	_columnsCount = newColumsCount;
 	_rowsCount = newRowsCount;
 
-	_matrix = createArr(newRowsCount, newColumsCount, std::complex<double>(0));
+	_matrix = createArr(newRowsCount, newColumsCount, Complex(0));
 
 }
 
-std::complex<double> ** Matrix::createArr(size_t rowsCount, size_t columsCount, std::complex<double> defaultParam)
+Complex ** Matrix::createArr(size_t rowsCount, size_t columsCount, Complex defaultParam)
 {
-	std::complex<double> **resultArr = new std::complex<double> *[rowsCount];
+	Complex **resultArr = new Complex *[rowsCount];
 	for (int i = 0; i < rowsCount; i++)
 	{
-		resultArr[i] = new std::complex<double>[columsCount];
+		resultArr[i] = new Complex[columsCount];
 	}
 
 	setDefaultParams(rowsCount, columsCount, defaultParam, resultArr);
 	return resultArr;
 }
 
-void Matrix::setDefaultParams(size_t rowsCount, size_t columsCount, std::complex<double> defaultParam, std::complex<double> **obj)
+void Matrix::setDefaultParams(size_t rowsCount, size_t columsCount, Complex defaultParam, Complex **obj)
 {
 	for (int i = 0; i < rowsCount; i++)
 	{
@@ -487,10 +487,10 @@ void Matrix::setDefaultParams(size_t rowsCount, size_t columsCount, std::complex
 	}
 }
 
-std::complex<double>* Matrix::getDiagonale() const
+Complex* Matrix::getDiagonale() const
 {
 	auto size = std::min(rowsCount(), columnsCount());
-	auto result = new std::complex<double>[size];
+	auto result = new Complex[size];
 
 	for(auto i = 0; i < size; i++)
 	{
@@ -499,18 +499,19 @@ std::complex<double>* Matrix::getDiagonale() const
 	return result;
 }
 
-void Matrix::getNumbersAndVectors(std::complex<double> ***vectors, std::complex<double> **numbers) const
+
+void Matrix::getNumbersAndVectors(Complex ***vectors, Complex **numbers) const
 {
 	if (!isRectangle())
 		throw std::exception("Is'nt rectangle matrix");
 
 	auto size = rowsCount();
 	auto d = getDiagonale();
-	auto z = createArr(size, size, std::complex<double>(1));
+	auto z = createArr(size, size, Complex(1));
 
 
 	auto underDCount = (size * size - size) / 2;
-	std::complex<double> *e = new std::complex<double>[underDCount + 2];
+	Complex *e = new Complex[underDCount + 2];
 
 	auto counter = 0;
 	for (auto i = 0; i < size; i++)
@@ -524,34 +525,35 @@ void Matrix::getNumbersAndVectors(std::complex<double> ***vectors, std::complex<
 
 
 	int m, l, iter, i, k;
-	std::complex<double> s, r, p, g, f, dd, c, b;
+	Complex s, r, p, g, f, dd, c, b;
 	for (i = 2; i <= size; i++) e[i - 1] = e[i];
 	e[size] = 0.;
 	for (l = 1; l <= size; l++) {
 		iter = 0;
 		do {
 			for (m = l; m <= size - 1; m++) {
-				dd = abs(d[m]) + abs(d[m + 1]);
-				if ((abs(e[m]) + dd) == dd)
+				dd = d[m].abs() + d[m + 1].abs();
+				if ((dd + e[m].abs() ) == dd)
 				{
 					break;
 				}
 			}
 			if (m != l) {
 				if (++iter >= MAXITER) throw std::exception("Too many iterations in tqli");
-				g = (d[l + 1] - d[l]) / (2.*e[l]);
+				g = (d[l + 1] - d[l]) / (e[l] * 2);
 
 
-				r = sqrt(std::complex<double>(1) + g * g);
-				if (g.real() >= 0.) g += abs(r);
-				else g -= abs(r);
+				r = (Complex(1) + g * g).cSqrt();
+				if (g.real() >= 0.) g += r.abs();
+				else g -= r.abs();
 				g = d[m] - d[l] + e[l] / g;
 				s = c = 1.; p = 0.;
 				for (i = m - 1; i >= l; i--) {
 					f = s * e[i]; b = c * e[i];
-					e[i + 1] = r = sqrt(f*f + g * g);
+					e[i + 1] = r = (f*f + g * g).cSqrt();
 					if (r == 0.) { d[i + 1] -= p; e[m] = 0.; break; }
-					s = f / r; c = g / r; g = d[i + 1] - p; r = (d[i] - g)*s + 2.*c*b; d[i + 1] = g + (p = s * r); g = c * r - b;
+					s = f / r; c = g / r; g = d[i + 1] - p; r = (d[i] - g)*s + c*b*2;
+					d[i + 1] = g + (p = s * r); g = c * r - b;
 					for (k = 1; k <= size; k++) {
 						f = z[k][i + 1]; z[k][i + 1] = s * z[k][i] + c * f; z[k][i] = c * z[k][i] - s * f;
 					}
